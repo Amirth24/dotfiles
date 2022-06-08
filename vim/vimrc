@@ -34,7 +34,8 @@ call plug#begin("~/.vim/plugged")
     Plug 'preservim/nerdtree' " NerdTree
     Plug 'vim-airline/vim-airline' " Airline 
     Plug 'vim-airline/vim-airline-themes' " Themes for Airline
-  
+    Plug 'rust-lang/rust.vim' " Rust Pluging 
+    Plug 'neoclide/coc.nvim' , {'branch':'release'}
 call plug#end()
 " }}}
 
