@@ -40,8 +40,10 @@ call plug#begin("~/.vim/plugged")
     Plug 'rust-lang/rust.vim' " Rust Pluging 
     Plug 'neoclide/coc.nvim' , {'branch':'release'}
     Plug 'morhetz/gruvbox'
+    Plug 'vimsence/vimsence'
     Plug 'ryanoasis/vim-devicons'
-call plug#end()
+    Plug 'mattn/emmet-vim'
+    call plug#end()
 " }}}
 
 " MAPPING ------------------------------------------------------- {{{
@@ -141,4 +143,5 @@ let g:NERDTreeStatusline = ''
 " Automatically close nvim if NERDTree is only one open
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) |q| endif
 
-
+" Emmet Plugin Config
+let g:user_emmet_mode = 'in'
