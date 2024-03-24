@@ -1,0 +1,274 @@
+
+call plug#begin()
+ Plug 'github/copilot.vim'
+ Plug 'dracula/vim'
+ Plug 'ryanoasis/vim-devicons'
+ Plug 'SirVer/ultisnips'
+ Plug 'honza/vim-snippets'
+ Plug 'scrooloose/nerdtree'
+ Plug 'preservim/nerdcommenter'
+ Plug 'mhinz/vim-startify'
+ Plug 'neoclide/coc.nvim', {'branch': 'release'}
+ Plug 'vim-airline/vim-airline'
+ Plug 'vim-airline/vim-airline-themes'
+ Plug 'tpope/vim-fugitive'
+ Plug 'nvim-lua/plenary.nvim'
+ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+ Plug 'junegunn/fzf.vim'
+ Plug 'tpope/vim-surround'
+ Plug 'williamboman/mason.nvim'
+ Plug 'williamboman/mason-lspconfig.nvim'
+ Plug 'neovim/nvim-lspconfig'
+ Plug 'nvim-lua/completion-nvim'
+ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
+ Plug 'hrsh7th/cmp-nvim-lsp'
+ Plug 'hrsh7th/cmp-buffer'
+ Plug 'hrsh7th/cmp-path'
+ Plug 'hrsh7th/cmp-cmdline'
+ Plug 'hrsh7th/nvim-cmp'
+ Plug 'hrsh7th/cmp-vsnip'
+Plug 'hrsh7th/vim-vsnip'
+call plug#end()
+
+
+
+" Open NerdTree automatically
+" autocmd StdinReadPre * let s:std_in=1
+" autocmd VimEnter * NERDTree
+
+let g:NERDTreeGitStatusWithFlags = 1
+let g:NERDTreeIgnore = ['^node_modules$']
+"let g:WebDevIconsUnicodeDecorateFolderNodes = 1
+"let g:NERDTreeGitStatusNodeColorization = 1
+"let g:NERDTreeColorMapCustom = {
+    "\ "Staged"    : "#0ee375",  
+    "\ "Modified"  : "#d9bf91",  
+    "\ "Renamed"   : "#51C9FC",  
+    "\ "Untracked" : "#FCE77C",  
+    "\ "Unmerged"  : "#FC51E6",  
+    "\ "Dirty"     : "#FFBD61",  
+    "\ "Clean"     : "#87939A",   
+    "\ "Ignored"   : "#808080"   
+    "\ }                         
+
+" Coc Config
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gr <Plug>(coc-references)
+
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+nnoremap <silent> <space>s :<C-u>CocList -I symbols<cr>
+
+nnoremap <silent> <space>d :<C-u>CocList diagnostics<cr>
+
+nmap <leader>do <Plug>(coc-codeaction)
+
+nmap <leader>rn <Plug>(coc-rename)
+
+let g:coc_global_extensions = [
+  \ 'coc-tsserver',
+  \ 'coc-json',
+  \ 'coc-css',
+  \  'coc-eslint',
+  \  'coc-prettier'
+  \ ]
+set laststatus=2
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_powerline_fonts = 1
+let g:airline_statusline_ontop=0
+let g:airline_theme='simple'
+let g:airline#extensions#tabline#formatter = 'default'
+" navegação entre os buffers
+nnoremap <M-Right> :bn<cr>
+nnoremap <M-Left> :bp<cr>
+nnoremap <c-x> :bp \|bd #<cr>
+
+
+set number
+set hidden
+set cursorline
+set expandtab
+set autoindent
+set smartindent
+set shiftwidth=4
+set tabstop=4
+set encoding=utf8
+set history=2000
+set clipboard=unnamedplus
+
+" Key Mapping
+" Ctrl + P : Open FZF
+noremap <c-P> <cmd> Files <CR> 
+" Ctrl + N: Open Toggle NerdTree
+noremap <silent> <c-N> <cmd> NERDTreeToggle<CR>
+" Ctrl + F: Open FZF Ag
+noremap <silent> <c-F> <cmd> Ag <CR> 
+
+" Ctrl + S: Save
+noremap <c-S> <cmd> w <CR>
+
+" Next Tab
+noremap <silent> <c-H> <cmd> tabnext <CR>
+" Previous Tab
+noremap <silent> <c-L> <cmd> tabprevious <CR>
+
+" Previous Commands
+noremap <silent> <c-Up> <cmd> history <CR>
+
+
+" -------------------- LSP ---------------------------------
+:lua << EOF
+  local cmp = require'cmp'
+
+  cmp.setup({
+    snippet = {
+      -- REQUIRED - you must specify a snippet engine
+      expand = function(args)
+        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+        -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+      end,
+    },
+    window = {
+      -- completion = cmp.config.window.bordered(),
+      -- documentation = cmp.config.window.bordered(),
+    },
+    mapping = cmp.mapping.preset.insert({
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.abort(),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    }),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'vsnip' }, -- For vsnip users.
+      -- { name = 'luasnip' }, -- For luasnip users.
+      -- { name = 'ultisnips' }, -- For ultisnips users.
+      -- { name = 'snippy' }, -- For snippy users.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Set configuration for specific filetype.
+  cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+      { name = 'git' }, -- You can specify the `git` source if [you were installed it](https://github.com/petertriho/cmp-git).
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline({ '/', '?' }, {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = 'buffer' }
+    }
+  })
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
+  })
+
+  -- Set up lspconfig.
+  local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local nvim_lsp = require('lspconfig')
+local on_attach = function(client, bufnr)
+  require('completion').on_attach()
+  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+  buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
+  -- Mappings
+  local opts = { noremap=true, silent=true }
+  buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+  buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+  buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+  buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+  buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+  buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+  buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+  -- Set some keybinds conditional on server capabilities
+  if client.server_capabilities.document_formatting then
+      buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+  elseif client.server_capabilities.document_range_formatting then
+      buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+  end
+  -- Set autocommands conditional on server_capabilities
+  if client.server_capabilities.document_highlight then
+      require('lspconfig').util.nvim_multiline_command [[
+      :hi LspReferenceRead cterm=bold ctermbg=red guibg=LightYellow
+      :hi LspReferenceText cterm=bold ctermbg=red guibg=LightYellow
+      :hi LspReferenceWrite cterm=bold ctermbg=red guibg=LightYellow
+      augroup lsp_document_highlight
+          autocmd!
+          autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
+          autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+      augroup END
+      ]]
+  end
+end
+local servers = {'pylsp','vimls','gopls', 'rust_analyzer'}
+for _, lsp in ipairs(servers) do
+  nvim_lsp[lsp].setup {
+    on_attach = on_attach,
+    capabilities=capabilities
+  }
+end
+
+
+-- Config Treesitter
+require'nvim-treesitter.configs'.setup ({
+  ensure_installed = {"c", "lua", "vim",
+    "vimdoc", "query" , "typescript",
+    "yaml", "json", "html",
+    "css", "javascript", "go", 
+    "rust", "python", "bash", "dockerfile", "toml",},
+  sync_install = false,  
+  auto_install = true, 
+  ignore_install = { "javascript" },
+
+  highlight = {
+    enable = true,
+    disable = function(lang, buf)
+        local max_filesize = 100 * 1024 -- 100 KB
+        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+        if ok and stats and stats.size > max_filesize then
+            return true
+        end
+    end,
+  },
+  indent = {
+    enable = true
+  }
+})
+
+
+require('mason').setup {
+  -- your configuration comes here
+  -- or leave it empty to use the default settings
+  -- refer to the configuration section below
+}
+
+require('mason-lspconfig').setup {
+  -- your configuration comes here
+  -- or leave it empty to use the default settings
+  -- refer to the configuration section below
+}
+EOF
